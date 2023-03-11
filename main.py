@@ -2,7 +2,7 @@ from flask import Flask, render_template,request,render_template_string
 from note import*
 
 token = get_token()
-selections = {"artists":[],"tracks":[],"genres":[]}
+selections = []
 artists = []
 
 
@@ -49,12 +49,25 @@ def store_select():
         global selections
         for artist in artists:
             if artist["name"] == selection:
-                selections["artists"].append(artist)
+                selections.append(artist)
 
         template1 = "<h5> your selection: {{selection}} </h5>"
-        template2 = "<div class='float-right'><li class = 'list-group-item'>{% for selection in selections['artists'] %}<button class='close' type='button'><span aria-hidden='true'> &times;</span></button>{{ selection['name'] }}</li>{% endfor %}</div>"
-        html = render_template_string(template1+template2, selection = selection, selections=selections)
+        template2 = "<div class='float-right'>{% for selection in selections %}<li class = 'list-group-item'><button class='close' id='{{selection['id']}}'type='button'><span aria-hidden='true'> &times;</span></button>{{ selection['name'] }}</li>{% endfor %}</div>"
+        html = render_template_string(template1+"躢"+template2, selection = selection, selections=selections)
     return html
 
-
+@app.route("/store_delete",methods=["GET","POST"])
+def delete_select():
+    if request.method == "POST":
+        deletion = request.form["data"]
+        print(f"delete_id:{deletion}")
+        global selections
+        for idx,item in enumerate(selections):
+            if item["id"] == deletion:
+                delete_id = idx
+        
+        selections.pop(delete_id)
+        template2 = "<div class='float-right'>{% for selection in selections %}<li class = 'list-group-item'><button class='close' id='{{selection['id']}}'type='button'><span aria-hidden='true'> &times;</span></button>{{ selection['name'] }}</li>{% endfor %}</div>"
+        html = render_template_string(template2, selections=selections)
+    return html       
 app.run(debug=True)

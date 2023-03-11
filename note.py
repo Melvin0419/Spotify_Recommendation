@@ -37,7 +37,6 @@ def get_auth_header(token):
 # input: artist name (str)
 # output: return a dict contain{"name","url","image_url","id"}
 
-
 def search_for_artist(token, artist_name):
     url = "https://api.spotify.com/v1/search"
     headers = get_auth_header(token)
@@ -63,10 +62,12 @@ def search_for_artist(token, artist_name):
     artists = []
     for artist in json_result:
         artists.append({
+            "type":"artist",
             "name" : artist["name"],
             "genres" : artist["genres"],
             "url" : artist["external_urls"]["spotify"],
-            "image_url" : artist["images"][1]["url"],
+            # some artist may not have image, images = []
+            "image_url" : artist["images"],
             "id" : artist["id"]
         })
     
@@ -103,6 +104,7 @@ def search_for_track(token, track_name):
         artists_name = "、".join([artist["name"] for artist in artists])
         track_name = track["name"]
         tracks.append({
+            "type":"track",
             "name" :  f"{track_name} - {artists_name}",
             "url" : track["external_urls"]["spotify"],
             "id" : track["id"]
